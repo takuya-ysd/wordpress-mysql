@@ -1,0 +1,25 @@
+- name: install php
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - php
+    - php-mysql
+
+- name: set timezone
+  ini_file:
+    dest: /etc/php.ini
+    section: Date
+    option: date.timezone
+    value: '"Asia/Tokyo"'
+
+- name: create test page for php
+  copy:
+    src: phpinfo.php
+    dest: /var/www/html/phpinfo.php
+
+- name: restart httpd
+  systemd:
+    name: httpd
+    state: restarted
+    enabled: yes

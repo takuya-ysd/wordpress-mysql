@@ -1,0 +1,15 @@
+- name: disable selinux 
+  selinux:
+    policy: targeted
+    state: disabled
+
+- name: install firewalld
+  yum:
+    name: firewalld
+    state: present
+
+- name: enable firewalld
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes

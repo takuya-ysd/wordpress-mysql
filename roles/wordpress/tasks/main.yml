@@ -1,0 +1,22 @@
+- name: DL wordpress
+  get_url:
+    url: "{{ wordpress_url }}"
+    dest: /tmp/wordpress.tar.gz
+
+- name: unarchive wordpress
+  unarchive:
+    src: /tmp/wordpress.tar.gz
+    dest: /var/www/html/
+    copy: no
+
+- name: set owner
+  file:
+    path: /var/www/html/wordpress/
+    owner: apache
+    group: apache
+    recurse: yes
+
+- name: restart httpd
+  systemd:
+    name: httpd
+    state: restarted

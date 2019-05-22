@@ -1,0 +1,51 @@
+- name: install repo
+  yum:
+    name: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+
+- name: install MySQL8
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - mysql
+    - mysql-server
+    - MySQL-python
+
+- name: copy my.cnf
+  copy:
+    src: my.cnf
+    dest: /etc/my.cnf
+    mode: 0644
+
+- name: start myslqd
+  systemd:
+    name: mysqld
+    state: restarted
+    enabled: yes
+
+- name: get temporary password
+  shell: "grep MY-010454 /var/log/mysqld.log | awk '{print $NF}'"
+  register: temporary_password
+
+- name: set root password
+#  command: mysql --user root --password={{ temporary_password.stdout }} --connect-expired-password --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Hogehoge!1';"
+  command: mysql --user root --password=Hogehoge!1 --connect-expired-password --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Hogehoge!1';"
+
+- name: create database
+  mysql_db:
+    login_user: root
+    login_password: Hogehoge!1
+    name: "{{ db_name }}"
+    state: present
+    encoding: utf8
+
+- name: create db user
+  mysql_user:
+    login_user: root
+    login_password: Hogehoge!1
+    name: "{{ db_user }}"
+    password: Hogehoge!2
+    priv: "wordpress.*:ALL"
+    host: "%"
+    state: present
+    append_privs: yes

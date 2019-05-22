@@ -1,0 +1,9 @@
+[webservers]
+192.168.138.140:63022
+
+[dbservers]
+192.168.138.140:63022
+
+[staging:children]
+webservers
+dbservers
